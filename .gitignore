@@ -39,3 +39,20 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local embedded database
+.pglite/
+
+# AI assistant / agent files
+.claude/
+CLAUDE.md
+AGENTS.md
+.cursor/
+.cursorrules
+.windsurf/
+.aider*
+.copilot/
+.github/copilot-instructions.md
+
+# keep the env template
+!.env.example
