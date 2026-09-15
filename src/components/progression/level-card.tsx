@@ -76,7 +76,7 @@ export function RankCard({ rank, total, gapToNext, isPublic }: { rank: number | 
     <Card className="py-4">
       <CardContent className="px-4">
         <div className="flex items-start gap-3">
-          <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-amber-500/15 text-amber-500">
             <Trophy className="size-5" />
           </div>
           <div className="min-w-0 flex-1">

@@ -7,10 +7,10 @@ import { Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { deleteSession } from "@/actions/sessions";
 import { formatDuration, formatNumber } from "@/lib/format";
-import { MEDIA_TYPE_META, UNIT_LABELS } from "@/lib/media";
-import { Badge } from "@/components/ui/badge";
+import { MEDIA_TYPE_META, unitLabel } from "@/lib/media";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Thumb } from "@/components/media/poster";
 import type { LibraryPick } from "@/components/library/types";
 import { SessionForm } from "./session-form";
 import type { SessionView } from "./types";
@@ -82,47 +82,38 @@ export function SessionList({
               <span className="tabular-nums text-muted-foreground">{formatDuration(g.seconds)}</span>
             </div>
           )}
-          <ul className="divide-y rounded-lg border">
+          <ul className="divide-y rounded-xl border">
             {g.items.map((s) => {
               const what = s.title ?? s.label ?? MEDIA_TYPE_META[s.mediaType].label;
               return (
-                <li key={s.id} className="flex items-center gap-3 px-3 py-2.5">
-                  <div className="h-10 w-7 shrink-0 overflow-hidden rounded-sm bg-muted">
-                    {s.coverUrl && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={s.coverUrl} alt="" className="h-full w-full object-cover" loading="lazy" />
-                    )}
-                  </div>
+                <li key={s.id} className="group flex items-center gap-3 px-3 py-2.5">
+                  <Thumb src={s.coverUrl} title={what} size="sm" />
                   <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                      {s.mediaItemId ? (
-                        <Link href={`/media/${s.mediaItemId}`} className="truncate font-medium hover:underline">
-                          {what}
-                        </Link>
-                      ) : (
-                        <span className="truncate font-medium">{what}</span>
-                      )}
-                      <Badge variant="secondary" className="text-[10px]">
-                        {MEDIA_TYPE_META[s.mediaType].label}
-                      </Badge>
-                    </div>
+                    {s.mediaItemId ? (
+                      <Link href={`/media/${s.mediaItemId}`} className="block truncate text-sm font-medium hover:underline">
+                        {what}
+                      </Link>
+                    ) : (
+                      <span className="block truncate text-sm font-medium">{what}</span>
+                    )}
                     <div className="truncate text-xs text-muted-foreground">
-                      {fmt.time.format(new Date(s.startedAt))}
-                      {s.amount != null && s.amountUnit && (
+                      {MEDIA_TYPE_META[s.mediaType].label} · {fmt.time.format(new Date(s.startedAt))}
+                      {s.amount != null && s.amount > 0 && s.amountUnit && (
                         <>
                           {" · "}
-                          {formatNumber(s.amount)} {UNIT_LABELS[s.amountUnit]}
+                          {formatNumber(s.amount)} {unitLabel(s.amountUnit, s.amount)}
                         </>
                       )}
                       {s.notes && <> · {s.notes}</>}
                     </div>
                   </div>
-                  <div className="shrink-0 tabular-nums text-sm">{formatDuration(s.durationSeconds)}</div>
-                  <div className="flex shrink-0">
-                    <Button variant="ghost" size="icon-sm" aria-label="Edit" onClick={() => setEditing(s)}>
+                  <div className="shrink-0 text-sm tabular-nums">{formatDuration(s.durationSeconds)}</div>
+                  {/* Row actions stay out of the way until the row is hovered or focused. */}
+                  <div className="flex shrink-0 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100">
+                    <Button variant="ghost" size="icon-sm" aria-label="Edit session" onClick={() => setEditing(s)}>
                       <Pencil />
                     </Button>
-                    <Button variant="ghost" size="icon-sm" aria-label="Delete" onClick={() => remove(s.id)} disabled={pending}>
+                    <Button variant="ghost" size="icon-sm" aria-label="Delete session" onClick={() => remove(s.id)} disabled={pending}>
                       <Trash2 />
                     </Button>
                   </div>

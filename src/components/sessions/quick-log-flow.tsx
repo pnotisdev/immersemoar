@@ -38,6 +38,11 @@ interface Selected {
   stats?: { seconds: number; sessions: number; progress: number; totalAmount: number | null; totalUnit: Unit | null };
 }
 
+/** "an anime" / "a manga" — media labels are user-facing, so the article has to agree. */
+function article(label: string) {
+  return /^[aeiou]/i.test(label) ? "an" : "a";
+}
+
 const TYPE_ORDER: MediaType[] = ["anime", "manga", "visual_novel", "light_novel", "book", "series", "movie", "youtube", "podcast", "drama_cd", "graded_reader", "game", "news", "other"];
 
 export function QuickLogFlow({ picks, tz }: { picks: PickWithStats[]; tz: string }) {
@@ -255,7 +260,9 @@ export function QuickLogFlow({ picks, tz }: { picks: PickWithStats[]; tz: string
                       Log “{query}” as a one-off {meta.label.toLowerCase()} without adding it to the library
                     </>
                   ) : (
-                    <>Log a {meta.label.toLowerCase()} without a specific title</>
+                    <>
+                      Log {article(meta.label)} {meta.label.toLowerCase()} without a specific title
+                    </>
                   )}
                 </button>
               </div>

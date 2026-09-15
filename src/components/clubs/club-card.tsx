@@ -16,7 +16,7 @@ export interface ClubCardData {
 
 export function ClubCard({ club }: { club: ClubCardData }) {
   return (
-    <Link href={`/clubs/${club.id}`} className="group flex flex-col overflow-hidden rounded-lg border transition-colors hover:bg-muted/40">
+    <Link href={`/clubs/${club.id}`} className="group flex flex-col overflow-hidden rounded-xl border transition-colors hover:bg-muted/40">
       <div className="relative h-24 bg-muted">
         {club.coverUrl && (
           // eslint-disable-next-line @next/next/no-img-element

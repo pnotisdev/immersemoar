@@ -12,9 +12,17 @@ Think Toggl for immersion, with a library attached.
 - **History**: any day, week, month, year or custom range; per-day/week/month charts; heatmap; by-type and top-item breakdowns.
 - **Progression**: XP (1 XP per minute, so every medium is worth the same), overall / reading / listening levels, current and longest streak, daily averages, reading speed (chars/hour), month-over-month comparison.
 - **Goals**: "1000 hours in 2026", "2M characters of VNs this month" — any metric, any medium, any period, with an on-pace marker.
-- **Ranking**: global and per-medium leaderboards (week / month / year / all time), public profile pages, opt-out in settings.
+- **Discover**: trending anime, manga and light novels from AniList plus the most-voted visual novels from VNDB, with cover art. Tap a cover and it lands in your library.
+- **Community**: an activity feed (everyone, or just the people you follow), follows, kudos on sessions, a member directory, and public profile pages showing what someone is on right now.
+- **Ranking**: global and per-medium leaderboards (week / month / year / all time), rankable against everyone or only the people you follow; opt out in settings.
 - **Clubs**: public or private (join code), tagged, up to 100 members, member leaderboard, and voting on what to consume together next.
 - **Texthooker**: connect **LunaTranslator** (`ws://localhost:2333/api/ws/text/origin`) or **Textractor** (`ws://localhost:6677`) from the browser; lines stream in, characters and *active* time (idle gaps excluded) are counted, and one click saves the session against your VN.
+
+## Navigation
+
+Five destinations — **Home, Library, Discover, Community, Stats** — plus one **Log** button. Everything else (session log, goals, texthooker, settings, your profile) lives in the account menu. On phones the same five become a bottom tab bar with logging in the middle.
+
+Signed-out visitors get a public landing page at `/` with live community numbers; everything else redirects to `/login`.
 
 ## Stack
 
@@ -30,6 +38,17 @@ pnpm dev
 ```
 
 Open http://localhost:3000, create an account, add something to your library, start the timer.
+
+### Demo data
+
+The community pages are dull with one account, so there is a seeder:
+
+```bash
+pnpm seed:demo            # ~9 demo members, real covers from AniList/VNDB, months of sessions, follows, kudos, a club
+pnpm seed:demo --reset    # delete previously seeded demo members first
+```
+
+Demo accounts are real accounts you can sign in as: `<handle>@demo.immersemoar.app` / `immerse-demo-2026` (handles are printed at the end of the run). They are recognisable by that email domain, which is also how `--reset` finds them — never run the seeder against a production database.
 
 ### Environment
 
@@ -56,16 +75,19 @@ Without `DATABASE_URL` the app uses an embedded Postgres in `./.pglite`. It is *
 | `pnpm db:push` | apply the Drizzle schema (dev) |
 | `pnpm db:generate` / `pnpm db:migrate` | SQL migrations for production |
 | `pnpm db:studio` | Drizzle Studio |
+| `pnpm seed:demo` | demo community (see above) |
 | `pnpm lint` / `pnpm typecheck` | |
 
 ## Data model
 
 ```
-media_items          shared across users; deduplicated on (source, source_id)
+media_items          shared across users; deduplicated on (source, source_id); cover + banner art
 library_entries      user × item: status, progress (native unit), rating, notes
 immersion_sessions   the core primitive: started_at, duration, optional item, optional amount + unit
 active_timers        one running timer per user
 goals                metric (time | unit), optional media type, date range, target
+follows              directed, no approval; private profiles never appear in feeds or rankings
+session_kudos        one heart per (session, user)
 clubs / club_members / club_picks / club_pick_votes
 ```
 

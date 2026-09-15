@@ -39,6 +39,7 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-surface: var(--surface);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -48,73 +49,80 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/*
+ * Palette: cool near-neutral greys with a single blue accent, the way Letterboxd and
+ * AniList stay calm around artwork. Colour is reserved for what the user did (accent,
+ * streak, reading/listening tones); everything structural is grey.
+ */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  --background: oklch(0.995 0.001 250);
+  --foreground: oklch(0.21 0.012 255);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: var(--foreground);
+  --surface: oklch(0.975 0.003 250);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --popover-foreground: var(--foreground);
+  --primary: oklch(0.54 0.152 256);
+  --primary-foreground: oklch(0.99 0.002 250);
+  --secondary: oklch(0.96 0.004 250);
+  --secondary-foreground: oklch(0.26 0.012 255);
+  --muted: oklch(0.965 0.004 250);
+  --muted-foreground: oklch(0.53 0.012 255);
+  --accent: oklch(0.955 0.008 253);
+  --accent-foreground: oklch(0.36 0.09 256);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --border: oklch(0.915 0.005 255);
+  --input: oklch(0.915 0.005 255);
+  --ring: oklch(0.54 0.152 256);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
+  --radius: 0.7rem;
   --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--primary);
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.97 0 0);
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar-ring: var(--ring);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  --background: oklch(0.175 0.012 258);
+  --foreground: oklch(0.955 0.004 250);
+  --card: oklch(0.215 0.013 258);
+  --card-foreground: var(--foreground);
+  --surface: oklch(0.205 0.013 258);
+  --popover: oklch(0.225 0.013 258);
+  --popover-foreground: var(--foreground);
+  --primary: oklch(0.65 0.135 253);
+  --primary-foreground: oklch(0.16 0.015 258);
+  --secondary: oklch(0.27 0.013 258);
+  --secondary-foreground: oklch(0.955 0.004 250);
+  --muted: oklch(0.265 0.013 258);
+  --muted-foreground: oklch(0.7 0.012 255);
+  --accent: oklch(0.3 0.03 255);
+  --accent-foreground: oklch(0.88 0.06 253);
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --border: oklch(1 0 0 / 9%);
+  --input: oklch(1 0 0 / 13%);
+  --ring: oklch(0.65 0.135 253);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar: oklch(0.205 0.013 258);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--primary);
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.269 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --sidebar-ring: var(--ring);
 }
 
 @layer base {
@@ -123,37 +131,78 @@
   }
   body {
     @apply bg-background text-foreground;
+    -webkit-tap-highlight-color: transparent;
   }
   html {
     @apply font-sans;
+    scrollbar-gutter: stable;
+  }
+  /*
+   * A grid with no explicit columns places everything in one *implicit* column, which is
+   * auto-sized — so a single wide child (a poster rail, a chart) stretches that column and
+   * the whole page scrolls sideways. Clamp implicit columns the way Tailwind's grid-cols-*
+   * utilities already clamp explicit ones. Only implicit columns are affected.
+   */
+  .grid {
+    grid-auto-columns: minmax(0, 1fr);
+  }
+  /* Headings carry the weight; body text stays quiet. */
+  h1,
+  h2,
+  h3 {
+    @apply tracking-tight;
+    text-wrap: balance;
   }
 }
+
+@layer utilities {
+  /* Rails scroll without scrollbar furniture; see components/media/scroll-rail.tsx. */
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  /* Standard poster ratio, so mixed sources (AniList 2:3, VNDB, TMDB) line up. */
+  .poster {
+    @apply relative aspect-[2/3] w-full overflow-hidden rounded-lg bg-muted;
+  }
+  .section-label {
+    @apply text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase;
+  }
+  /* Room for the mobile tab bar plus the home indicator. */
+  .pb-safe {
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.5rem);
+  }
+}
+
 /* --- Data-viz tokens (validated sequential blue ramp; dark steps are selected, not flipped) --- */
 :root {
   --viz-series: #2a78d6;
-  --viz-series-track: #cde2fb;
-  --viz-seq-0: #f0efec;
+  --viz-series-track: #dbe8fa;
+  --viz-seq-0: #eceef1;
   --viz-seq-1: #cde2fb;
   --viz-seq-2: #86b6ef;
   --viz-seq-3: #3987e5;
   --viz-seq-4: #1c5cab;
   --viz-seq-5: #0d366b;
-  --viz-grid: #e1e0d9;
-  --viz-axis: #c3c2b7;
-  --viz-muted: #898781;
+  --viz-grid: #e3e5e9;
+  --viz-axis: #c3c5cb;
+  --viz-muted: #86888f;
   --viz-good: #006300;
 }
 .dark {
-  --viz-series: #3987e5;
-  --viz-series-track: #22344f;
-  --viz-seq-0: #2c2c2a;
+  --viz-series: #4f97ec;
+  --viz-series-track: #23344c;
+  --viz-seq-0: #272b31;
   --viz-seq-1: #0d366b;
   --viz-seq-2: #1c5cab;
   --viz-seq-3: #3987e5;
   --viz-seq-4: #86b6ef;
   --viz-seq-5: #cde2fb;
-  --viz-grid: #2c2c2a;
-  --viz-axis: #383835;
-  --viz-muted: #898781;
+  --viz-grid: #2a2e35;
+  --viz-axis: #3a3f47;
+  --viz-muted: #8b8e95;
   --viz-good: #0ca30c;
 }

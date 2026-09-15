@@ -22,7 +22,11 @@ function niceMaxHours(maxSeconds: number): number {
   return Math.ceil(h / 6) * 6;
 }
 
-/** Width of the wrapping element, measured after mount so the SVG renders 1:1 (no viewBox text scaling). */
+/**
+ * Width of the wrapping element, measured after mount so the SVG renders 1:1 (no viewBox text scaling).
+ * The SVG itself is taken out of flow by the caller, otherwise its intrinsic width would
+ * push the container wider and the measurement could never shrink again.
+ */
 function useContainerWidth<T extends HTMLElement>(fallback: number) {
   const ref = useRef<T>(null);
   const [width, setWidth] = useState(fallback);
@@ -55,8 +59,16 @@ export function ColumnChart({ columns, height = 160 }: { columns: Column[]; heig
   const y = (seconds: number) => TOP + plotH - (seconds / 3600 / maxH) * plotH;
 
   return (
-    <div ref={ref} className="w-full">
-      <svg width={width} height={height} className="block text-[10px]" role="img" aria-label="Time per day">
+    // Fixed height + absolutely positioned SVG: the chart can never widen its parent,
+    // which is what used to make narrow screens scroll sideways.
+    <div ref={ref} className="relative w-full min-w-0 overflow-hidden" style={{ height }}>
+      <svg
+        width={width}
+        height={height}
+        className="absolute top-0 left-0 block text-[10px]"
+        role="img"
+        aria-label="Time per day"
+      >
         {ticks.map((t) => (
           <g key={t}>
             <line x1={LEFT} x2={width} y1={y(t * 3600)} y2={y(t * 3600)} stroke={t === 0 ? "var(--viz-axis)" : "var(--viz-grid)"} strokeWidth={1} />

@@ -60,6 +60,8 @@ export const mediaItems = pgTable(
     title: text("title").notNull(),
     titleNative: text("title_native"),
     coverUrl: text("cover_url"),
+    // Wide key art (AniList banners); used for media page headers.
+    bannerUrl: text("banner_url"),
     year: smallint("year"),
     description: text("description"),
     externalUrl: text("external_url"),

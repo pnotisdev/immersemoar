@@ -20,16 +20,19 @@ export interface LeaderboardOptions {
   to: Date;
   /** Restrict to these media types; undefined = everything. */
   types?: MediaType[];
+  /** Restrict to these users (e.g. the people you follow); undefined = everyone public. */
+  userIds?: string[];
   limit?: number;
 }
 
 const sumSeconds = sql<number>`coalesce(sum(${immersionSessions.durationSeconds}), 0)::int`.mapWith(Number);
 
-function rangeWhere({ from, to, types }: LeaderboardOptions) {
+function rangeWhere({ from, to, types, userIds }: LeaderboardOptions) {
   return and(
     gte(immersionSessions.startedAt, from),
     lt(immersionSessions.startedAt, to),
     types && types.length > 0 ? inArray(immersionSessions.mediaType, types) : undefined,
+    userIds ? inArray(immersionSessions.userId, userIds.length > 0 ? userIds : [""]) : undefined,
   );
 }
 

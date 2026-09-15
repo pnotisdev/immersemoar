@@ -34,12 +34,17 @@ export function formatNumber(n: number) {
   return full.format(n);
 }
 
-/** "just now", "3h ago", "2 days ago" relative to `now`. */
+/** "just now", "12m ago", "3h ago", "2d ago", "5w ago" relative to `now`. */
 export function relativeTime(date: Date | string, now = new Date()): string {
-  const ms = now.getTime() - new Date(date).getTime();
-  const h = Math.floor(ms / 3_600_000);
-  if (h < 1) return "just now";
+  const minutes = Math.floor((now.getTime() - new Date(date).getTime()) / 60_000);
+  if (minutes < 1) return "just now";
+  if (minutes < 60) return `${minutes}m ago`;
+  const h = Math.floor(minutes / 60);
   if (h < 24) return `${h}h ago`;
   const d = Math.floor(h / 24);
-  return `${d} day${d === 1 ? "" : "s"} ago`;
+  if (d < 7) return `${d}d ago`;
+  const w = Math.floor(d / 7);
+  if (w < 6) return `${w}w ago`;
+  const mo = Math.floor(d / 30);
+  return mo < 12 ? `${mo}mo ago` : `${Math.floor(d / 365)}y ago`;
 }

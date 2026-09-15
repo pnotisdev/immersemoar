@@ -118,6 +118,7 @@ export async function getTopItems(userId: string, from: Date, to: Date, limit = 
       title: mediaItems.title,
       titleNative: mediaItems.titleNative,
       coverUrl: mediaItems.coverUrl,
+      bannerUrl: mediaItems.bannerUrl,
       type: mediaItems.type,
       seconds: sumSeconds,
       count: countRows,
@@ -294,4 +295,24 @@ export async function getItemStats(userId: string) {
     .where(and(eq(immersionSessions.userId, userId), sql`${immersionSessions.mediaItemId} is not null`))
     .groupBy(immersionSessions.mediaItemId);
   return new Map(rows.map((r) => [r.mediaItemId as string, { seconds: r.seconds, count: r.count }]));
+}
+
+/** What the whole community logged the most time on in a range — the Discover rail. */
+export async function getCommunityTopItems(from: Date, to: Date, limit = 12) {
+  return db
+    .select({
+      mediaItemId: mediaItems.id,
+      title: mediaItems.title,
+      titleNative: mediaItems.titleNative,
+      coverUrl: mediaItems.coverUrl,
+      type: mediaItems.type,
+      seconds: sumSeconds,
+      learners: sql<number>`count(distinct ${immersionSessions.userId})::int`.mapWith(Number),
+    })
+    .from(immersionSessions)
+    .innerJoin(mediaItems, eq(immersionSessions.mediaItemId, mediaItems.id))
+    .where(and(gte(immersionSessions.startedAt, from), lt(immersionSessions.startedAt, to)))
+    .groupBy(mediaItems.id)
+    .orderBy(desc(sumSeconds))
+    .limit(limit);
 }

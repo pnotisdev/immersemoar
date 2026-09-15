@@ -2,6 +2,7 @@ import { cleanDescription, FETCH_TIMEOUT_MS, type SearchResponse, type SearchRes
 
 const API = "https://api.themoviedb.org/3";
 const IMG = "https://image.tmdb.org/t/p/w342";
+const BACKDROP = "https://image.tmdb.org/t/p/w1280";
 
 interface TmdbMovie {
   id: number;
@@ -9,6 +10,7 @@ interface TmdbMovie {
   original_title: string;
   original_language: string;
   poster_path: string | null;
+  backdrop_path: string | null;
   release_date: string | null;
   overview: string | null;
 }
@@ -18,6 +20,7 @@ interface TmdbTv {
   original_name: string;
   original_language: string;
   poster_path: string | null;
+  backdrop_path: string | null;
   first_air_date: string | null;
   overview: string | null;
 }
@@ -52,6 +55,7 @@ export async function searchTmdb(kind: "movie" | "series", q: string): Promise<S
       // Only treat the original title as "native" when it's actually Japanese.
       titleNative: r.original_language === "ja" && original !== title ? original : null,
       coverUrl: r.poster_path ? `${IMG}${r.poster_path}` : null,
+      bannerUrl: r.backdrop_path ? `${BACKDROP}${r.backdrop_path}` : null,
       year: yearFrom(date),
       description: cleanDescription(r.overview),
       externalUrl: `https://www.themoviedb.org/${isMovie ? "movie" : "tv"}/${r.id}`,

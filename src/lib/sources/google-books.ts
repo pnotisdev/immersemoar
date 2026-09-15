@@ -42,6 +42,7 @@ export async function searchGoogleBooks(mediaType: "book" | "graded_reader", q: 
       title,
       titleNative: null,
       coverUrl,
+      bannerUrl: null,
       year: yearFrom(info.publishedDate),
       description: cleanDescription(info.description),
       externalUrl: info.infoLink ?? null,

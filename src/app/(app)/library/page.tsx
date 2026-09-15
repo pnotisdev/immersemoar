@@ -1,19 +1,15 @@
 import Link from "next/link";
+import { Compass } from "lucide-react";
 import { ENTRY_STATUSES, MEDIA_TYPES, type EntryStatus, type MediaType } from "@/db/schema";
 import { MEDIA_TYPE_META, STATUS_LABELS } from "@/lib/media";
 import { getLibrary } from "@/lib/queries";
 import { requireUser } from "@/lib/session";
-import { cn } from "@/lib/utils";
 import { PageHeader } from "@/components/layout/page-header";
+import { TabLinks } from "@/components/layout/tab-links";
 import { AddMediaDialog } from "@/components/library/add-media-dialog";
 import { MediaCard } from "@/components/library/media-card";
 
 export const metadata = { title: "Library" };
-
-const STATUS_TABS: { key: EntryStatus | "all"; label: string }[] = [
-  { key: "all", label: "All" },
-  ...ENTRY_STATUSES.map((s) => ({ key: s, label: STATUS_LABELS[s] })),
-];
 
 export default async function LibraryPage(props: PageProps<"/library">) {
   const user = await requireUser();
@@ -35,48 +31,65 @@ export default async function LibraryPage(props: PageProps<"/library">) {
     return `/library${qs ? `?${qs}` : ""}`;
   };
 
+  const statusTabs = [
+    { href: q("all", type), label: "All", count: everything.length },
+    ...ENTRY_STATUSES.map((s) => ({
+      href: q(s, type),
+      label: STATUS_LABELS[s],
+      count: everything.filter((e) => e.status === s).length,
+    })).filter((t) => t.count > 0 || everything.length === 0),
+  ];
+
   return (
     <div>
-      <PageHeader title="Library" description={`${everything.length} item${everything.length === 1 ? "" : "s"}`} actions={<AddMediaDialog />} />
-
-      <div className="mb-4 flex flex-wrap gap-1 border-b">
-        {STATUS_TABS.map((t) => {
-          const active = (status ?? "all") === t.key;
-          const count = t.key === "all" ? everything.length : everything.filter((e) => e.status === t.key).length;
-          return (
+      <PageHeader
+        title="Library"
+        description={`${everything.length} title${everything.length === 1 ? "" : "s"} tracked`}
+        actions={
+          <>
             <Link
-              key={t.key}
-              href={q(t.key, type)}
-              className={cn(
-                "-mb-px border-b-2 px-3 py-2 text-sm",
-                active ? "border-foreground font-medium" : "border-transparent text-muted-foreground hover:text-foreground",
-              )}
+              href="/discover"
+              className="inline-flex h-8 items-center gap-1.5 rounded-full border px-3.5 text-sm transition-colors hover:bg-muted"
             >
-              {t.label} <span className="ml-1 text-xs text-muted-foreground">{count}</span>
+              <Compass className="size-4" /> Discover
             </Link>
-          );
-        })}
-      </div>
+            <AddMediaDialog />
+          </>
+        }
+      />
+
+      <TabLinks tabs={statusTabs} active={q(status ?? "all", type)} />
 
       {typesInLibrary.length > 1 && (
-        <div className="mb-5 flex flex-wrap gap-1.5">
-          <Link href={q(status)} className={cn("rounded-full border px-2.5 py-0.5 text-xs", !type && "bg-muted font-medium")}>
-            All types
-          </Link>
-          {typesInLibrary.map((t) => (
-            <Link key={t} href={q(status, t)} className={cn("rounded-full border px-2.5 py-0.5 text-xs", type === t && "bg-muted font-medium")}>
-              {MEDIA_TYPE_META[t].label}
-            </Link>
-          ))}
-        </div>
+        <TabLinks
+          tabs={[
+            { href: q(status), label: "All types" },
+            ...typesInLibrary.map((t) => ({ href: q(status, t), label: MEDIA_TYPE_META[t].label })),
+          ]}
+          active={q(status, type)}
+          variant="pill"
+          className="mb-5"
+        />
       )}
 
       {entries.length === 0 ? (
-        <div className="rounded-lg border border-dashed p-10 text-center text-sm text-muted-foreground">
-          {everything.length === 0 ? "Your library is empty. Add an anime, a VN, a book — anything you're consuming in Japanese." : "Nothing matches this filter."}
+        <div className="rounded-xl border border-dashed p-12 text-center">
+          <p className="text-sm text-muted-foreground">
+            {everything.length === 0
+              ? "Your library is empty. Add an anime, a VN, a book — anything you're consuming in Japanese."
+              : "Nothing matches this filter."}
+          </p>
+          {everything.length === 0 && (
+            <Link
+              href="/discover"
+              className="mt-4 inline-flex h-8 items-center gap-1.5 rounded-full bg-primary px-3.5 text-sm font-medium text-primary-foreground"
+            >
+              <Compass className="size-4" /> Browse popular titles
+            </Link>
+          )}
         </div>
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-3 gap-x-3 gap-y-5 sm:grid-cols-4 lg:grid-cols-6">
           {entries.map((e) => (
             <MediaCard
               key={e.id}
@@ -91,6 +104,7 @@ export default async function LibraryPage(props: PageProps<"/library">) {
                 progressUnit: e.progressUnit,
                 totalAmount: e.mediaItem.totalAmount,
                 totalUnit: e.mediaItem.totalUnit,
+                rating: e.rating,
               }}
             />
           ))}

@@ -65,6 +65,35 @@ export function mediaTypeLabel(type: MediaType) {
   return MEDIA_TYPE_META[type].label;
 }
 
+/** Maps a media group to the matching BarList/StatTile color tone (reading = amber, listening = teal). */
+export function groupTone(group: MediaGroup): "default" | "reading" | "listening" {
+  return group === "reading" || group === "listening" ? group : "default";
+}
+
+/** "1 episode" / "12 episodes" — every unit label is plural, so singularise for one. */
+export function unitLabel(unit: Unit, amount: number): string {
+  const label = UNIT_LABELS[unit];
+  return amount === 1 ? label.replace(/s$/, "") : label;
+}
+
+/** How a session reads in the activity feed: "watched 2 episodes of…", "read 8k characters of…". */
+export function activityVerb(type: MediaType): string {
+  switch (type) {
+    case "anime":
+    case "movie":
+    case "series":
+    case "youtube":
+      return "watched";
+    case "podcast":
+    case "drama_cd":
+      return "listened to";
+    case "game":
+      return "played";
+    default:
+      return "read";
+  }
+}
+
 export function typesInGroup(group: MediaGroup): MediaType[] {
   return (Object.keys(MEDIA_TYPE_META) as MediaType[]).filter((t) => MEDIA_TYPE_META[t].group === group);
 }

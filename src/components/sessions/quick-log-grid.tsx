@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import type { MediaType } from "@/db/schema";
-import { MEDIA_TYPE_META } from "@/lib/media";
 import { formatDuration } from "@/lib/format";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Poster } from "@/components/media/poster";
 import type { LibraryPick } from "@/components/library/types";
 import { SessionForm } from "./session-form";
 
@@ -29,24 +29,18 @@ export function QuickLogGrid({ items, entries, tz }: { items: QuickLogItem[]; en
 
   return (
     <>
-      <div className="grid grid-cols-3 gap-2 sm:grid-cols-6 lg:grid-cols-3">
+      <div className="grid grid-cols-3 gap-3 sm:grid-cols-6">
         {items.map((it) => (
           <button
             key={it.mediaItemId}
             type="button"
             onClick={() => setActive(it)}
-            className="group relative aspect-[2/3] overflow-hidden rounded-lg bg-muted text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+            className="group relative block overflow-hidden rounded-lg text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
             title={`Log ${it.title}`}
           >
-            {it.coverUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={it.coverUrl} alt="" className="h-full w-full object-cover transition-transform group-hover:scale-[1.03]" loading="lazy" />
-            ) : (
-              <div className="flex h-full items-center justify-center p-2 text-center text-xs text-muted-foreground">{MEDIA_TYPE_META[it.type].label}</div>
-            )}
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/50 to-transparent p-2 pt-6 text-white">
-              <div className="text-[9px] font-medium tracking-widest text-white/70 uppercase">Quick log</div>
-              <div className="line-clamp-2 text-xs font-medium leading-tight">{it.title}</div>
+            <Poster src={it.coverUrl} title={it.title} type={it.type} sizes="(max-width: 640px) 33vw, 180px" />
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/45 to-transparent p-2 pt-7 text-white">
+              <div className="line-clamp-2 text-xs leading-tight font-medium">{it.title}</div>
               <div className="text-[10px] text-white/70">
                 {formatDuration(it.seconds)} · {it.lastLabel}
               </div>

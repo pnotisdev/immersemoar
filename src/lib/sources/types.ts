@@ -8,6 +8,8 @@ export interface SearchResult {
   title: string;
   titleNative: string | null;
   coverUrl: string | null;
+  /** Wide key art, when the source has one (AniList banners, TMDB backdrops). */
+  bannerUrl: string | null;
   year: number | null;
   description: string | null;
   externalUrl: string | null;

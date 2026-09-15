@@ -9,14 +9,15 @@ export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const hasSession = Boolean(getSessionCookie(request));
 
-  if (PUBLIC_AUTH_PAGES.includes(pathname)) {
+  // Signed-in users never see the marketing page or the auth forms.
+  if (pathname === "/" || PUBLIC_AUTH_PAGES.includes(pathname)) {
     if (hasSession) return NextResponse.redirect(new URL("/dashboard", request.url));
     return NextResponse.next();
   }
 
   if (!hasSession) {
     const login = new URL("/login", request.url);
-    if (pathname !== "/") login.searchParams.set("next", pathname);
+    login.searchParams.set("next", pathname);
     return NextResponse.redirect(login);
   }
   return NextResponse.next();
