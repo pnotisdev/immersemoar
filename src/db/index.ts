@@ -15,6 +15,14 @@ function createDb(): Db {
   if (url) {
     return drizzlePostgres(url, { schema });
   }
+  if (process.env.NODE_ENV === "production") {
+    // A missing DATABASE_URL in production must fail loudly — silently falling
+    // back to an empty local PGlite database would boot a misconfigured deploy
+    // that looks healthy but talks to a throwaway, non-persistent database.
+    throw new Error(
+      "DATABASE_URL is not set. Refusing to fall back to the embedded PGlite database in production — set DATABASE_URL to your Postgres connection string.",
+    );
+  }
   // Embedded Postgres for local development; data lives in ./.pglite.
   // PGlite is single-process: never run `next build` or `drizzle-kit push` while `next dev` is up.
   return drizzlePglite("./.pglite", { schema });
