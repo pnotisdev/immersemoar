@@ -78,12 +78,22 @@ export default async function ProfilePage(props: PageProps<"/u/[username]">) {
     rating: e.rating,
   });
 
-  const action = isSelf ? (
-    <Link href="/settings" className="rounded-full border px-3.5 py-1.5 text-xs transition-colors hover:bg-muted">
-      Edit profile
+  const libraryLink = (
+    <Link href={`/u/${u.username}/library`} className="rounded-full border px-3.5 py-1.5 text-xs transition-colors hover:bg-muted">
+      Library
     </Link>
-  ) : (
-    <FollowButton userId={u.id} initialFollowing={following} />
+  );
+  const action = (
+    <div className="flex items-center gap-2">
+      {libraryLink}
+      {isSelf ? (
+        <Link href="/settings" className="rounded-full border px-3.5 py-1.5 text-xs transition-colors hover:bg-muted">
+          Edit profile
+        </Link>
+      ) : (
+        <FollowButton userId={u.id} initialFollowing={following} />
+      )}
+    </div>
   );
 
   return (
@@ -199,7 +209,11 @@ export default async function ProfilePage(props: PageProps<"/u/[username]">) {
         <section className="mt-9">
           <SectionHeader
             title="Finished"
-            action={<span className="text-xs text-muted-foreground">{finished.length} titles</span>}
+            action={
+              <Link href={`/u/${u.username}/library?status=finished`} className="text-xs text-muted-foreground hover:text-foreground">
+                {finished.length} titles
+              </Link>
+            }
           />
           <div className="grid grid-cols-3 gap-x-3 gap-y-5 sm:grid-cols-4 lg:grid-cols-6">
             {finished.slice(0, 12).map((e) => (
