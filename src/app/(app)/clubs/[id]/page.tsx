@@ -36,8 +36,9 @@ export default async function ClubPage(props: PageProps<"/clubs/[id]">) {
   const membership = await getMembership(id, user.id);
   const isMember = Boolean(membership);
   const isOwner = club.ownerId === user.id;
-  // Private clubs are invisible to non-members (except by join code).
-  if (club.visibility === "private" && !isMember) notFound();
+  // Private clubs are invisible to non-members (except by join code). A club an
+  // admin has hidden (see /admin) gets the same treatment for non-members.
+  if ((club.visibility === "private" || club.hidden) && !isMember) notFound();
 
   const range = presetRange(period, tz);
   const [board, picks, library] = await Promise.all([getClubLeaderboard(id, range.from, range.to), isMember ? getClubPicks(id, user.id) : [], isMember ? getLibraryPicks(user.id) : []]);
@@ -110,7 +111,7 @@ export default async function ClubPage(props: PageProps<"/clubs/[id]">) {
                 <li key={r.userId} className={cn("flex items-center gap-3 rounded-md px-2 py-1.5", r.userId === user.id && "bg-[var(--viz-series-track)]/40")}>
                   <span className="w-6 text-right text-sm tabular-nums text-muted-foreground">{r.rank}</span>
                   <Avatar name={r.name} image={r.image} size="sm" />
-                  <Link href={`/u/${r.userId}`} className="min-w-0 flex-1 truncate text-sm font-medium hover:underline">
+                  <Link href={`/u/${r.username}`} className="min-w-0 flex-1 truncate text-sm font-medium hover:underline">
                     {r.name}
                     {r.userId === club.ownerId && <span className="ml-1 text-xs font-normal text-muted-foreground">owner</span>}
                   </Link>

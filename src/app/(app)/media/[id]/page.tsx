@@ -147,7 +147,7 @@ export default async function MediaPage(props: PageProps<"/media/[id]">) {
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border bg-surface px-4 py-3">
           <div className="flex -space-x-2">
             {community.recent.slice(0, 6).map((m) => (
-              <Link key={m.userId} href={`/u/${m.userId}`} title={m.name}>
+              <Link key={m.userId} href={`/u/${m.username}`} title={m.name}>
                 <Avatar name={m.name} image={m.image} size="sm" className="ring-2 ring-background" />
               </Link>
             ))}

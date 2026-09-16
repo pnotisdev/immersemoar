@@ -27,6 +27,7 @@ export async function listPublicClubs(opts: { q?: string; tag?: string; limit?: 
     .where(
       and(
         eq(clubs.visibility, "public"),
+        eq(clubs.hidden, false),
         q ? or(ilike(clubs.name, `%${q}%`), ilike(clubs.description, `%${q}%`)) : undefined,
         opts.tag ? sql`${opts.tag} = any(${clubs.tags})` : undefined,
       ),
@@ -73,6 +74,8 @@ export async function getMembership(clubId: string, userId: string) {
 export interface ClubLeaderboardRow {
   rank: number;
   userId: string;
+  /** See LeaderboardRow.username in ranking-queries.ts for why this is assumed non-null. */
+  username: string;
   name: string;
   image: string | null;
   seconds: number;
@@ -82,7 +85,7 @@ export interface ClubLeaderboardRow {
 /** Members ranked by logged time in a range. Membership implies consent, so private profiles are included here. */
 export async function getClubLeaderboard(clubId: string, from: Date, to: Date): Promise<ClubLeaderboardRow[]> {
   const members = await db
-    .select({ userId: clubMembers.userId, name: user.name, image: user.image })
+    .select({ userId: clubMembers.userId, username: sql<string>`${user.username}`, name: user.name, image: user.image })
     .from(clubMembers)
     .innerJoin(user, eq(clubMembers.userId, user.id))
     .where(eq(clubMembers.clubId, clubId));
@@ -106,7 +109,7 @@ export async function getClubLeaderboard(clubId: string, from: Date, to: Date): 
   const life = new Map(allTime.map((r) => [r.userId, r.seconds]));
 
   return members
-    .map((m) => ({ userId: m.userId, name: m.name, image: m.image, seconds: range.get(m.userId) ?? 0, level: levelFromSeconds(life.get(m.userId) ?? 0) }))
+    .map((m) => ({ userId: m.userId, username: m.username, name: m.name, image: m.image, seconds: range.get(m.userId) ?? 0, level: levelFromSeconds(life.get(m.userId) ?? 0) }))
     .sort((a, b) => b.seconds - a.seconds)
     .map((r, i) => ({ ...r, rank: i + 1 }));
 }

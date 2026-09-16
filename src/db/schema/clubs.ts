@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { index, pgEnum, pgTable, primaryKey, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { boolean, index, pgEnum, pgTable, primaryKey, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { mediaItems } from "./app";
 import { user } from "./auth";
 
@@ -47,6 +47,9 @@ export const clubs = pgTable(
     ownerId: text("owner_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
+    // Moderation: hidden clubs drop out of public discovery and, for non-members,
+    // the club page itself — same treatment as a private club (see clubs/[id]/page.tsx).
+    hidden: boolean("hidden").notNull().default(false),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [index("clubs_visibility_idx").on(t.visibility)],

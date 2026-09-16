@@ -38,6 +38,7 @@ export interface NavUser {
   name: string;
   email: string;
   image: string | null;
+  username: string | null;
 }
 
 interface NavLink {
@@ -137,7 +138,9 @@ function AccountMenu({ user }: { user: NavUser }) {
             <span className="truncate text-xs font-normal text-muted-foreground">{user.email}</span>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem render={<Link href={`/u/${user.id}`} />}>
+          {/* Falls back to Settings on the practically-unreachable chance a session's
+              username hasn't landed yet (e.g. mid-backfill) — never links to /u/null. */}
+          <DropdownMenuItem render={<Link href={user.username ? `/u/${user.username}` : "/settings"} />}>
             <User /> Your profile
           </DropdownMenuItem>
           {MENU_LINKS.map((l) => (

@@ -33,7 +33,13 @@ export const sessionKudos = pgTable(
       .references(() => user.id, { onDelete: "cascade" }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (t) => [primaryKey({ columns: [t.sessionId, t.userId] }), index("session_kudos_session_idx").on(t.sessionId)],
+  (t) => [
+    primaryKey({ columns: [t.sessionId, t.userId] }),
+    index("session_kudos_session_idx").on(t.sessionId),
+    // kudosByUser filters by user_id alone (plus an inArray on session_id); the PK and
+    // the index above are both session_id-first, so neither can serve a user_id lookup.
+    index("session_kudos_user_idx").on(t.userId),
+  ],
 );
 
 export const followsRelations = relations(follows, ({ one }) => ({

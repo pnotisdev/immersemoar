@@ -134,6 +134,12 @@ export default async function LandingPage() {
             immerse<span className="opacity-60">moar</span>
           </span>
           <span>Cover art and metadata from AniList, VNDB, TMDB and Google Books.</span>
+          <Link href="/terms" className="hover:text-foreground">
+            Terms
+          </Link>
+          <Link href="/privacy" className="hover:text-foreground">
+            Privacy
+          </Link>
           <Link href="/login" className="ml-auto hover:text-foreground">
             Sign in
           </Link>

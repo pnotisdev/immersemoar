@@ -14,13 +14,13 @@ function FeedRow({ item, viewerId, now }: { item: FeedItem; viewerId: string; no
 
   return (
     <li className="flex gap-3 py-3.5">
-      <Link href={`/u/${item.userId}`} className="shrink-0">
+      <Link href={`/u/${item.username}`} className="shrink-0">
         <Avatar name={item.name} image={item.image} size="md" />
       </Link>
 
       <div className="min-w-0 flex-1">
         <p className="text-sm leading-snug">
-          <Link href={`/u/${item.userId}`} className="font-medium hover:underline">
+          <Link href={`/u/${item.username}`} className="font-medium hover:underline">
             {item.name}
           </Link>{" "}
           <span className="text-muted-foreground">{activityVerb(item.mediaType)}</span>{" "}

@@ -1,5 +1,7 @@
 import { relations } from "drizzle-orm";
 import {
+  boolean,
+  customType,
   date,
   index,
   integer,
@@ -13,6 +15,20 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { user } from "./auth";
+
+/**
+ * Raw binary storage. Not a built-in drizzle-orm/pg-core helper (unlike text/integer/etc)
+ * — this is the documented way to declare a `bytea` column. Verified round-trip against
+ * both drivers this app uses: postgres.js (src/db/index.ts) hands back a Node `Buffer`;
+ * @electric-sql/pglite (local dev/tests) hands back a plain `Uint8Array` instead — same
+ * bytes, different wrapper. Readers should go through `Buffer.from(value)` (a no-op copy
+ * when it's already a Buffer) rather than assuming either shape.
+ */
+const bytea = customType<{ data: Buffer; driverData: Buffer | Uint8Array }>({
+  dataType() {
+    return "bytea";
+  },
+});
 
 export const MEDIA_TYPES = [
   "anime",
@@ -105,6 +121,9 @@ export const libraryEntries = pgTable(
   (t) => [
     uniqueIndex("library_entries_user_media_idx").on(t.userId, t.mediaItemId),
     index("library_entries_user_status_idx").on(t.userId, t.status),
+    // Lookups by media item alone (getMediaCommunity's "who's in library" query) can't
+    // use the (user_id, media_item_id) index above since media_item_id isn't the prefix.
+    index("library_entries_media_item_idx").on(t.mediaItemId),
   ],
 );
 
@@ -126,12 +145,18 @@ export const immersionSessions = pgTable(
     amount: integer("amount"),
     amountUnit: unitEnum("amount_unit"),
     notes: text("notes"),
+    // Moderation: hidden sessions are excluded from public feeds/queries but stay
+    // visible to their own owner and still count toward the owner's stats.
+    hidden: boolean("hidden").notNull().default(false),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [
     index("immersion_sessions_user_started_idx").on(t.userId, t.startedAt),
     index("immersion_sessions_media_idx").on(t.mediaItemId),
+    // The global feed (getFeed) sorts by started_at across every user, which the
+    // (user_id, started_at) index above can't serve since user_id isn't filtered first.
+    index("immersion_sessions_started_at_idx").on(t.startedAt.desc()),
   ],
 );
 
@@ -166,6 +191,24 @@ export const goals = pgTable(
   },
   (t) => [index("goals_user_idx").on(t.userId)],
 );
+
+/**
+ * Avatar image bytes, kept out of the `user` table itself so the (much more frequently
+ * read, e.g. on every session lookup) user row never carries a binary blob along for the
+ * ride. Stored directly in Postgres rather than an object-storage service — see the
+ * upload cap/resize logic in src/actions/... and src/app/api/avatar/[userId]/route.ts —
+ * per the project's constraint of no new paid infrastructure pre-launch. One row per
+ * user; re-uploading replaces it in place (onConflictDoUpdate) and bumps `updatedAt`,
+ * which src/lib/avatar.ts folds into the `user.image` URL (?v=<epoch>) to bust caches.
+ */
+export const userAvatars = pgTable("user_avatars", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => user.id, { onDelete: "cascade" }),
+  data: bytea("data").notNull(),
+  contentType: text("content_type").notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
 
 // --- Relations (for db.query.* relational API) ---
 

@@ -13,7 +13,7 @@ export async function followUser(targetId: string): Promise<ActionResult<{ follo
   if (targetId === me.id) return { ok: false, error: "You can't follow yourself" };
 
   const [target] = await db
-    .select({ id: user.id, publicProfile: user.publicProfile })
+    .select({ id: user.id, username: user.username, publicProfile: user.publicProfile })
     .from(user)
     .where(eq(user.id, targetId))
     .limit(1);
@@ -22,15 +22,16 @@ export async function followUser(targetId: string): Promise<ActionResult<{ follo
 
   await db.insert(follows).values({ followerId: me.id, followingId: targetId }).onConflictDoNothing();
   revalidatePath("/community");
-  revalidatePath(`/u/${targetId}`);
+  if (target.username) revalidatePath(`/u/${target.username}`);
   return { ok: true, data: { following: true } };
 }
 
 export async function unfollowUser(targetId: string): Promise<ActionResult<{ following: false }>> {
   const me = await requireUser();
+  const [target] = await db.select({ username: user.username }).from(user).where(eq(user.id, targetId)).limit(1);
   await db.delete(follows).where(and(eq(follows.followerId, me.id), eq(follows.followingId, targetId)));
   revalidatePath("/community");
-  revalidatePath(`/u/${targetId}`);
+  if (target?.username) revalidatePath(`/u/${target.username}`);
   return { ok: true, data: { following: false } };
 }
 

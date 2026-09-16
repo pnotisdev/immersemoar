@@ -140,7 +140,7 @@ export default async function CommunityPage(props: PageProps<"/community">) {
                 {top.map((r) => (
                   <li key={r.userId} className="flex items-center gap-2.5 text-sm">
                     <span className="w-4 shrink-0 text-xs tabular-nums text-muted-foreground">{r.rank}</span>
-                    <Link href={`/u/${r.userId}`} className="flex min-w-0 flex-1 items-center gap-2 hover:underline">
+                    <Link href={`/u/${r.username}`} className="flex min-w-0 flex-1 items-center gap-2 hover:underline">
                       <Avatar name={r.name} image={r.image} size="sm" />
                       <span className="truncate">{r.name}</span>
                     </Link>

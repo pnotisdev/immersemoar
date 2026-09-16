@@ -3,7 +3,7 @@ import { requireUser } from "@/lib/session";
 
 export default async function AppLayout({ children }: LayoutProps<"/">) {
   const user = await requireUser();
-  const navUser = { id: user.id, name: user.name, email: user.email, image: user.image ?? null };
+  const navUser = { id: user.id, name: user.name, email: user.email, image: user.image ?? null, username: user.username ?? null };
   return (
     <>
       <Nav user={navUser} />

@@ -89,6 +89,19 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
             {pending ? "…" : mode === "signup" ? "Create account" : "Sign in"}
           </Button>
         </form>
+        {mode === "signup" && (
+          <p className="mt-3 text-center text-xs text-muted-foreground">
+            By creating an account you agree to our{" "}
+            <Link href="/terms" className="underline underline-offset-4">
+              Terms
+            </Link>{" "}
+            and{" "}
+            <Link href="/privacy" className="underline underline-offset-4">
+              Privacy Policy
+            </Link>
+            .
+          </p>
+        )}
         <p className="mt-4 text-center text-sm text-muted-foreground">
           {mode === "signup" ? (
             <>

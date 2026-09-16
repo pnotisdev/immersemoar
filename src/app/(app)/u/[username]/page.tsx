@@ -7,6 +7,7 @@ import { getDailyTotals, getLibrary, getTopItems, getTypeBreakdown } from "@/lib
 import { getPublicUser, getUserRank } from "@/lib/ranking-queries";
 import { getFeed, getFollowCounts, isFollowing, listFollowConnections } from "@/lib/social-queries";
 import { requireUser } from "@/lib/session";
+import { USERNAME_RE } from "@/lib/username";
 import { SectionHeader } from "@/components/layout/page-header";
 import { ActivityFeed } from "@/components/community/activity-feed";
 import { FollowButton } from "@/components/community/follow-button";
@@ -20,16 +21,18 @@ import { SplitBar, StatStrip } from "@/components/stats/stat-strip";
 import { TypeBars } from "@/components/stats/type-bars";
 import { TopTitles } from "@/components/stats/top-titles";
 
-export async function generateMetadata(props: PageProps<"/u/[id]">) {
-  const { id } = await props.params;
-  const u = await getPublicUser(id);
+export async function generateMetadata(props: PageProps<"/u/[username]">) {
+  const { username } = await props.params;
+  const u = USERNAME_RE.test(username) ? await getPublicUser(username) : null;
   return { title: u ? u.name : "Profile" };
 }
 
-export default async function ProfilePage(props: PageProps<"/u/[id]">) {
+export default async function ProfilePage(props: PageProps<"/u/[username]">) {
   const viewer = await requireUser();
-  const { id } = await props.params;
-  const u = await getPublicUser(id);
+  const { username } = await props.params;
+  // Cheap guard so an obviously-malformed handle 404s before hitting the database.
+  if (!USERNAME_RE.test(username)) notFound();
+  const u = await getPublicUser(username);
   if (!u) notFound();
 
   const isSelf = u.id === viewer.id;
@@ -132,7 +135,7 @@ export default async function ProfilePage(props: PageProps<"/u/[id]">) {
         <div className="mt-3 flex items-center gap-2">
           <div className="flex -space-x-2">
             {followers.slice(0, 8).map((f) => (
-              <Link key={f.userId} href={`/u/${f.userId}`} title={f.name}>
+              <Link key={f.userId} href={`/u/${f.username}`} title={f.name}>
                 <Avatar name={f.name} image={f.image} size="sm" className="ring-2 ring-background" />
               </Link>
             ))}

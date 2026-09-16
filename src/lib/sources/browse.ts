@@ -1,4 +1,5 @@
 import "server-only";
+import { cacheGet, cacheSet } from "@/lib/cache-store";
 import { browseAniList } from "./anilist";
 import type { SearchResult } from "./types";
 import { browseVndb } from "./vndb";
@@ -37,21 +38,54 @@ const LOADERS: Record<ShelfKey, () => Promise<SearchResult[]>> = {
 };
 
 const TTL_MS = 60 * 60 * 1000;
+
+function cacheKey(key: ShelfKey) {
+  return `shelf:${key}`;
+}
+
+/**
+ * Two-tier cache. L1 is this in-memory Map: per-process, so repeated requests on the
+ * same worker within the TTL window never leave the process. L2 is the `cache_entries`
+ * Postgres table (src/lib/cache-store.ts): shared across every PM2 worker, so a plain
+ * per-process Map (the previous implementation) doesn't multiply upstream calls by
+ * worker count. AniList allows 30 requests a minute and VNDB asks for the same
+ * restraint, so the goal is at most one upstream call per shelf per hour, total, not
+ * per-process.
+ */
 type Entry = { at: number; value: Promise<SearchResult[]> };
-// Module-level so one process makes at most one upstream call per shelf per hour:
-// AniList allows 30 requests a minute and VNDB asks for the same restraint.
-const cache = new Map<ShelfKey, Entry>();
+const memo = new Map<ShelfKey, Entry>();
+
+function loadFresh(key: ShelfKey): Promise<SearchResult[]> {
+  return LOADERS[key]().then(
+    (items) => {
+      // Best-effort: a failed write to the shared cache just means the next request (on
+      // this or another process) refetches from upstream instead of hitting Postgres.
+      cacheSet(cacheKey(key), items).catch((err) => {
+        console.error(`[browse] failed to persist ${key} shelf cache:`, err);
+      });
+      return items;
+    },
+    (err) => {
+      // A failed fetch must not be cached, or the shelf stays broken for an hour.
+      memo.delete(key);
+      console.error(`[browse] ${key} failed:`, err);
+      return [] as SearchResult[];
+    },
+  );
+}
 
 function load(key: ShelfKey): Promise<SearchResult[]> {
-  const hit = cache.get(key);
+  const hit = memo.get(key);
   if (hit && Date.now() - hit.at < TTL_MS) return hit.value;
-  const value = LOADERS[key]().catch((err) => {
-    // A failed fetch must not be cached, or the shelf stays broken for an hour.
-    cache.delete(key);
-    console.error(`[browse] ${key} failed:`, err);
-    return [] as SearchResult[];
-  });
-  cache.set(key, { at: Date.now(), value });
+
+  const value = cacheGet<SearchResult[]>(cacheKey(key), TTL_MS)
+    .catch((err) => {
+      console.error(`[browse] failed to read ${key} shelf cache:`, err);
+      return undefined;
+    })
+    .then((shared) => shared ?? loadFresh(key));
+
+  memo.set(key, { at: Date.now(), value });
   return value;
 }
 

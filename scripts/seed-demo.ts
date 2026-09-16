@@ -7,6 +7,12 @@
  *
  * Demo accounts are real accounts (email + password) so you can sign in as them and
  * see the app from another member's side. They are recognisable by their email domain.
+ *
+ * Run via `pnpm seed:demo`, not bare `tsx scripts/seed-demo.ts`: this script calls into
+ * src/lib/auth.ts, which imports src/lib/email.ts, which is marked `import "server-only"`
+ * — a marker package that throws unless the "react-server" export condition is active.
+ * Next's own bundler sets that condition automatically; a standalone Node/tsx process
+ * doesn't, so the package.json script passes `--conditions=react-server` explicitly.
  */
 import { config } from "dotenv";
 config({ path: ".env.local" });
@@ -184,8 +190,11 @@ async function ensureUsers(): Promise<SeededUser[]> {
       continue;
     }
     try {
+      // Passing `handle` as the username here (rather than leaving it to the
+      // auto-generate-on-signup hook in src/lib/auth.ts) is what gives demo profiles
+      // clean, memorable URLs like /u/mika instead of a slugified full name.
       await auth.api.signUpEmail({
-        body: { email, password: DEMO_PASSWORD, name: d.name, timezone: d.timezone, publicProfile: true },
+        body: { email, password: DEMO_PASSWORD, name: d.name, timezone: d.timezone, publicProfile: true, username: d.handle },
       });
     } catch (err) {
       console.warn(`  sign-up failed for ${email}:`, err instanceof Error ? err.message : err);
@@ -199,6 +208,10 @@ async function ensureUsers(): Promise<SeededUser[]> {
         image: avatarUrl(d.handle),
         // Backdate the account so "member since" reads like a real community.
         createdAt: daysAgo(d.historyDays + 3),
+        // Safety net independent of `pnpm seed:demo --reset`: keeps demo members out of
+        // the leaderboard/"most active" sort even if the reset script is never run
+        // before launch. See src/lib/ranking-queries.ts and src/lib/social-queries.ts.
+        isDemo: true,
       })
       .where(eq(user.id, created.id));
     out.push({ ...d, id: created.id });

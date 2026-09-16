@@ -25,7 +25,7 @@ function Row({ row, max, isViewer }: { row: LeaderboardRow; max: number; isViewe
         style={{ width: `${share}%` }}
       />
       <Link
-        href={`/u/${row.userId}`}
+        href={`/u/${row.username}`}
         className="relative flex items-center gap-3 rounded-md px-2.5 py-2.5 transition-colors hover:bg-foreground/[0.04]"
       >
         <span className={cn("w-6 shrink-0 text-center text-sm font-semibold tabular-nums", MEDAL[row.rank] ?? "text-muted-foreground")}>

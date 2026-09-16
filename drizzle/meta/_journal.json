@@ -1,0 +1,41 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1789547300588,
+      "tag": "0000_panoramic_turbo",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1789547974716,
+      "tag": "0001_tidy_donald_blake",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789552277754,
+      "tag": "0002_perpetual_cerise",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1789552553704,
+      "tag": "0003_huge_centennial",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1789554936593,
+      "tag": "0004_adorable_senator_kelly",
+      "breakpoints": true
+    }
+  ]
+}
