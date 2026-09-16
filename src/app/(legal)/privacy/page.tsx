@@ -5,7 +5,8 @@ import type { ReactNode } from "react";
 
 export const metadata = { title: "Privacy Policy" };
 
-const LAST_UPDATED = "2026-09-16";
+// Exported so sitemap.ts can report an accurate <lastmod> without duplicating the date.
+export const LAST_UPDATED = "2026-09-16";
 
 export default function PrivacyPage() {
   return (

@@ -8,6 +8,7 @@ import { addFromSearch, addManual } from "@/actions/library";
 import { ENTRY_STATUSES, MEDIA_TYPES, UNITS, type EntryStatus, type MediaType, type Unit } from "@/db/schema";
 import { MEDIA_TYPE_META, SOURCE_LABELS, STATUS_LABELS, UNIT_LABELS } from "@/lib/media";
 import type { SearchResponse, SearchResult } from "@/lib/sources";
+import { TmdbLogo } from "@/components/media/tmdb-logo";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -154,6 +155,13 @@ function SearchTab({ type, status, onDone }: { type: MediaType; status: EntrySta
         <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input autoFocus placeholder={`Search ${MEDIA_TYPE_META[type].label.toLowerCase()}…`} value={q} onChange={(e) => setQ(e.target.value)} className="pl-8" />
       </div>
+      {/* TMDB's terms require visible attribution wherever their data appears, not just
+          a text mention in the tab label — see src/components/media/tmdb-logo.tsx. */}
+      {MEDIA_TYPE_META[type].searchSource === "tmdb" && (
+        <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <TmdbLogo className="h-3 w-auto" /> results from The Movie Database
+        </p>
+      )}
       {active && warning && <p className="text-sm text-muted-foreground">{warning}</p>}
       {active && loading && <p className="text-sm text-muted-foreground">Searching…</p>}
       {active && !loading && results.length === 0 && !warning && (

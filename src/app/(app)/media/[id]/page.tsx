@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AddToLibraryButton } from "@/components/library/add-to-library-button";
 import { EntryEditor } from "@/components/library/entry-editor";
 import { Poster } from "@/components/media/poster";
+import { TmdbLogo } from "@/components/media/tmdb-logo";
 import { Avatar } from "@/components/ranking/avatar";
 import { LogSessionButton } from "@/components/sessions/log-session-button";
 import { SessionList } from "@/components/sessions/session-list";
@@ -114,7 +115,10 @@ export default async function MediaPage(props: PageProps<"/media/[id]">) {
                   rel="noreferrer"
                   className="inline-flex items-center gap-1 hover:text-foreground"
                 >
-                  {SOURCE_LABELS[item.source]} <ExternalLink className="size-3" />
+                  {/* TMDB's terms require visible attribution, not just a text mention
+                      — see src/components/media/tmdb-logo.tsx. */}
+                  {item.source === "tmdb" ? <TmdbLogo className="h-3.5 w-auto" /> : SOURCE_LABELS[item.source]}{" "}
+                  <ExternalLink className="size-3" />
                 </a>
               )}
             </div>
